@@ -1,1 +1,3 @@
 # temperatur-Sensors-to-MQTT
+
+coming soon...
