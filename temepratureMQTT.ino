@@ -35,13 +35,13 @@ PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
 boolean reconnect() {
-  if (client.connect("Arduino_1", "Arduino_1", 0, true, "offline")) {
+  if (client.connect("A1", "A1", 0, true, "offline")) {
     // Once connected, publish an announcement...
-    client.publish("Arduino_1","online", true);
+    client.publish("A1","online", true);
     // ... and resubscribe
     client.subscribe("inTopic");
   }
-  //Serial.println("MQTT verbunden");
+  Serial.println("MQTT verbunden");
   return client.connected();
 }
 
@@ -52,20 +52,18 @@ void setup() {
   client.setServer(server, 1883);
   Ethernet.begin(mac, ip);
 
-  delay(3500);
+  delay(3500); /// 3500
   lastReconnectAttempt = 0;
    
   Serial.begin(115200);
 
   //======================================================================
   //Sensoren starten:
-  dht[0].begin(); // Arbeitszimmer
-  dht[1].begin(); // Küche
-  dht[2].begin(); // Wohnzimmer
-  dht[3].begin(); // Schlafzimmer
-  dht[4].begin(); // Kinderzimmer
-  dht[5].begin(); // Bad
-  dht[6].begin(); // Badboden
+   //======================================================================
+  //Sensoren starten:
+   for (int i = 0; i < 6; i++) {
+     dht[i].begin();
+   }
   
 }
 
@@ -78,7 +76,7 @@ const long interval = 120000; //120000 Millisekunden aka 120 Sekunden, das Inter
 
 if (!client.connected()) {
     long now = millis();
-    if (now - lastReconnectAttempt > 5000) {
+    if (now - lastReconnectAttempt > 5000) { //5000
       lastReconnectAttempt = now;
       // Attempt to reconnect
       if (reconnect()) {
@@ -86,16 +84,12 @@ if (!client.connected()) {
       }
     }
   } else {
-    // Client connected
-
-    client.loop();
   }
 
 //----
 
 // Werte auslesen
-  for (int i = 0; i < 6; i++) { //Anzahl der angeschlossenen Sensoren eingeben
-  
+  for (int i = 0; i < 6; i++) { //Anzahl der angeschlossenen Sensoren eingeben - Badboden fehlt
 // Variablen Dekleration neu
 
 static char humidity[15]; //Speicherbereich reservieren um die Fechtigkeit zu speichern
@@ -103,24 +97,24 @@ static char temperature[15];
 float h[2];
 float t[2];
 //Feld für Topic je Raum
-char* Hum[]    = { "Arduino_1/AZ/Hum", "Arduino_1/Kueche/Hum", "Arduino_1/WZ/Hum", "Arduino_1/SZ/Hum", "Arduino_1/Kiz/Hum", "Arduino_1/Bad/Hum","Arduino_1/Badboden/Hum" };
-char* Temp[]    = { "Arduino_1/AZ/Temp", "Arduino_1/Kueche/Temp", "Arduino_1/WZ/Temp", "Arduino_1/SZ/Temp", "Arduino_1/Kiz/Temp", "Arduino_1/Bad/Temp", "Arduino_1/Badboden/Temp" };
+char* Hum[]    = { "A1/AZ/Hum", "A1/Kueche/Hum", "A1/WZ/Hum", "A1/SZ/Hum", "A1/Kiz/Hum", "A1/Bad/Hum","A1/Badboden/Hum" };
+char* Temp[]    = { "A1/AZ/Temp", "A1/Kueche/Temp", "A1/WZ/Temp", "A1/SZ/Temp", "A1/Kiz/Temp", "A1/Bad/Temp", "A1/Badboden/Temp" };
 
 // ende 
  
     h[i] = dht[i].readHumidity();
     t[i] = dht[i].readTemperature();
-    delay(10000); // Zeit bis zum Auslesen des nächsten Sensors 10000 = Alle 10 Sek der nächste Sensor -> alle Sensoren nach 50 Sek gelesen
+     delay(500); // Zeit bis zum Auslesen des nächsten Sensors 10000 = Alle 10 Sek der nächste Sensor -> alle Sensoren nach 50 Sek gelesen
    // check if returns are valid, if they are NaN (not a number) then something went wrong!
     if (isnan(t[i]) || isnan(h[i])) {
       Serial.print("Failed to read from DHT #"); Serial.println(i);
-    client.publish(Hum[i],"Sensorfehler",true);
-    client.publish(Temp[i],"Sensorfehler",true);//true sendet die Nachricht retained,
+    client.publish(Hum[i],"0",true);
+    client.publish(Temp[i],"0+",true);//true sendet die Nachricht retained,
 
     } 
   else 
   {
-    client.publish("Arduino_1","online", true);
+    client.publish("A1","online", true);
     dtostrf(h[i],6, 1, humidity);
     dtostrf(t[i],6, 1, temperature);
     
@@ -138,4 +132,6 @@ char* Temp[]    = { "Arduino_1/AZ/Temp", "Arduino_1/Kueche/Temp", "Arduino_1/WZ/
    
   } //ENDE for Schleife
   Serial.println();
+ delay(300000); // Zeit bis der nächste Abfragelauf aller Sensoren beginnt 
+
 }
