@@ -92,13 +92,13 @@ if (!client.connected()) {
   for (int i = 0; i < 6; i++) { //Anzahl der angeschlossenen Sensoren eingeben - Badboden fehlt
 // Variablen Dekleration neu
 
-static char humidity[15]; //Speicherbereich reservieren um die Fechtigkeit zu speichern
-static char temperature[15];
+static char humidity[5]; //Speicherbereich reservieren um die Fechtigkeit zu speichern
+static char temperature[5];
 float h[2];
 float t[2];
 //Feld für Topic je Raum
-char* Hum[]    = { "A1/AZ/Hum", "A1/Kueche/Hum", "A1/WZ/Hum", "A1/SZ/Hum", "A1/Kiz/Hum", "A1/Bad/Hum","A1/Badboden/Hum" };
-char* Temp[]    = { "A1/AZ/Temp", "A1/Kueche/Temp", "A1/WZ/Temp", "A1/SZ/Temp", "A1/Kiz/Temp", "A1/Bad/Temp", "A1/Badboden/Temp" };
+char* Hum[]    = { "A1/AZ/Hum", "A1/Ku/Hum", "A1/WZ/Hum", "A1/SZ/Hum", "A1/Kiz/Hum", "A1/Bad/Hum","A1/Bb/Hum" };
+char* Temp[]    = { "A1/AZ/Temp", "A1/Ku/Temp", "A1/WZ/Temp", "A1/SZ/Temp", "A1/Kiz/Temp", "A1/Bad/Temp", "A1/Bb/Temp" };
 
 // ende 
  
@@ -115,19 +115,20 @@ char* Temp[]    = { "A1/AZ/Temp", "A1/Kueche/Temp", "A1/WZ/Temp", "A1/SZ/Temp", 
   else 
   {
     client.publish("A1","online", true);
-    dtostrf(h[i],6, 1, humidity);
-    dtostrf(t[i],6, 1, temperature);
+    dtostrf(h[i],2, 1, humidity);
+    dtostrf(t[i],2, 1, temperature);
     
     client.publish(Hum[i], humidity, true);
     client.publish(Temp[i], temperature, true);
     
+    /*
     Serial.print("Humidity "); Serial.print(i); Serial.print(": ");
     Serial.print(h[i]);
     Serial.print(" %\t");
     Serial.print("Temperature "); Serial.print(i); Serial.print(": ");
     Serial.print(t[i]);
     Serial.println(" *C");
-    
+    */
   }
    
   } //ENDE for Schleife
