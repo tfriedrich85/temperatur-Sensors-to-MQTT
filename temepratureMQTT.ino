@@ -6,6 +6,7 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 #include <DHT.h>
+#include <avr/wdt.h>
 
 #define DHT2TYPE DHT22  // DHT 22  (AM2302)
 
@@ -64,13 +65,13 @@ void setup() {
    for (int i = 0; i < 6; i++) {
      dht[i].begin();
    }
-  
+ wdt_enable(WDTO_400S); 
 }
 
 void loop() {
 
 unsigned long previousMillis = 0; //Zählervariable, zählt Millisekunden seit dem letzten Funktionsaufruf nach oben
-const long interval = 120000; //120000 Millisekunden aka 120 Sekunden, das Interval wie oft der Sensor überhaupt benutzt wird
+const long interval = 30000; //120000 Millisekunden aka 120 Sekunden, das Interval wie oft der Sensor überhaupt benutzt wird
 
 //Connect herstellen
 
@@ -87,7 +88,6 @@ if (!client.connected()) {
   }
 
 //----
-
 // Werte auslesen
   for (int i = 0; i < 6; i++) { //Anzahl der angeschlossenen Sensoren eingeben - Badboden fehlt
 // Variablen Dekleration neu
@@ -133,6 +133,6 @@ char* Temp[]    = { "A1/AZ/Temp", "A1/Ku/Temp", "A1/WZ/Temp", "A1/SZ/Temp", "A1/
    
   } //ENDE for Schleife
   Serial.println();
- delay(300000); // Zeit bis der nächste Abfragelauf aller Sensoren beginnt 
-
+ //delay(300000); // Zeit bis der nächste Abfragelauf aller Sensoren beginnt 
+  wdt_reset();
 }
